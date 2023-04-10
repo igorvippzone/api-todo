@@ -9,7 +9,7 @@ const ip = require("ip");
 const axios = require("axios");
 
 router.post("/recognition/callback/qr", (req, res) => {
-  console.log("qr: ", req.body);
+  console.log("qr: ", req);
 });
 
 router.get("/setQRCodeCallback/:ip", (req, res) => {
@@ -20,7 +20,7 @@ router.get("/setQRCodeCallback/:ip", (req, res) => {
 
   axios
     .post(
-      `http://${deviceIp}:8090/setIdentifyCallBack?${query}/api/device/recognition/callback/qr`
+      `http://${deviceIp}:8090/setQRCodeCallback?${query}/api/device/recognition/callback/qr`
     )
     .then((result) => console.log("qr-post ", result.data));
 });
@@ -34,12 +34,12 @@ router.get("/setIdentifyCallBack/:ip", (req, res) => {
   const serverIp = ip.address();
 
   const query = `pass=1&callbackUrl=http://${serverIp}:3000`;
-  
+
   axios
     .post(
       `http://${deviceIp}:8090/setIdentifyCallBack?${query}/api/device/recognition/callback`
     )
-    .then((res) => console.log("card-post ", res.data));
+    .then((res) => console.log("card-post: ", res.data));
 });
 
 module.exports = router;
