@@ -1,78 +1,45 @@
 const express = require("express");
 const router = express.Router();
 const { Todo } = require("./models");
+const ip = require("ip");
 
-const store = {
-  todo: [],
-};
+// const fetch = require("node-fetch");
+// const https = require("https");
 
-[1, 2, 3].map((el) => {
-  const newTodo = new Todo(`title ${el}`, `desc ${el}`);
-  store.todo.push(newTodo);
+const axios = require("axios");
+
+router.post("/recognition/callback/qr", (req, res) => {
+  console.log("qr: ", req.body);
 });
 
-router.get("/", (req, res) => {
-  const { todo } = store;
-  res.json(todo);
+router.get("/setQRCodeCallback/:ip", (req, res) => {
+  const { ip: deviceIp } = req.params;
+  const serverIp = ip.address();
+
+  const query = `pass=1&callbackUrl=http://${serverIp}:3000`;
+
+  axios
+    .post(
+      `http://${deviceIp}:8090/setIdentifyCallBack?${query}/api/device/recognition/callback/qr`
+    )
+    .then((result) => console.log("qr-post ", result.data));
 });
 
-router.get(`/:id`, (req, res) => {
-  const { todo } = store;
-  const { id } = req.params;
-
-  const idx = todo.findIndex((el) => el.id === id);
-
-  if (idx !== -1) {
-    res.json(todo[idx]);
-  } else {
-    res.status(404);
-    res.json("todo not found");
-  }
+router.post("/recognition/callback", (req, res) => {
+  console.log(req.body);
 });
 
-router.post("/", (req, res) => {
-  const { todo } = store;
-  const { title, desc } = req.body;
+router.get("/setIdentifyCallBack/:ip", (req, res) => {
+  const { ip: deviceIp } = req.params;
+  const serverIp = ip.address();
 
-  const newTodo = new Todo(title, desc);
-  todo.push(newTodo);
-
-  res.status(201);
-  res.json(newTodo);
-});
-
-router.put(`/:id`, (req, res) => {
-  const { todo } = store;
-  const { title, desc } = req.body;
-  const { id } = req.params;
-  const idx = todo.findIndex((el) => el.id === id);
-
-  if (idx !== -1) {
-    todo[idx] = {
-      ...todo[idx],
-      title,
-      desc,
-    };
-    res.json(todo[idx]);
-  } else {
-    res.status(404);
-    res.json("todo | not found");
-  }
-});
-
-router.delete(`/:id`, (req, res) => {
-  const { todo } = store;
-  const { id } = req.params;
-  const idx = todo.findIndex((el) => el.id === id);
-
-  if (idx !== -1) {
-    todo.splice(idx, 1);
-    res.json(true);
-  } else {
-    res.status(404);
-
-    res.json("todo | not found");
-  }
+  const query = `pass=1&callbackUrl=http://${serverIp}:3000`;
+  
+  axios
+    .post(
+      `http://${deviceIp}:8090/setIdentifyCallBack?${query}/api/device/recognition/callback`
+    )
+    .then((res) => console.log("card-post ", res.data));
 });
 
 module.exports = router;
