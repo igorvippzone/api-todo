@@ -16,7 +16,7 @@ router.get("/setQRCodeCallback/:ip", (req, res) => {
   const { ip: deviceIp } = req.params;
   const serverIp = ip.address();
 
-  const query = `pass=1&callbackUrl=http://${serverIp}:3000`;
+  const query = `pass=1&url=http://${serverIp}:3000`;
 
   axios
     .post(
